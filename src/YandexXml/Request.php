@@ -205,7 +205,7 @@ class Request
         'user' => '',
         'pass' => ''
     );
-
+    protected $limiter;
     /**
      * __construct
      *
@@ -216,6 +216,7 @@ class Request
     {
         $this->user = $user;
         $this->key = $key;
+        $this->limiter = new Limiter($user, $key);
     }
 
     /**
@@ -695,6 +696,7 @@ class Request
         if (is_null($host)) {
             return $this->getProxy();
         } else {
+            $this->limiter->setProxy($host, $port, $user, $pass);
             return $this->setProxy($host, $port, $user, $pass);
         }
     }
