@@ -8,6 +8,7 @@ class Limiter {
   public $last_hour;
   public $user;
   public $key;
+  public $last_request_time = 0;
   public $proxy = array();//host,port,user,pass
   const YANDEX_XML_URL = 'https://yandex.ru/search/xml';
   public function __construct($user, $key, $proxy=null) {
@@ -129,7 +130,7 @@ class Limiter {
     $hour = gmdate("G",$time);
     return $this->hour_limits[$hour];
   }
-  
+  //https://tech.yandex.ru/xml/doc/dg/concepts/restrictions-docpage/#rps-limits
   public function wait($time=null) {
     if(is_null($time)){
       $time = time();
@@ -138,7 +139,14 @@ class Limiter {
       $this->loadLimits();
     }
     $hour = gmdate("G",$time);
+    $safe_wait = ceil(2000/$this->hour_limits[$hour]);
+    if($this->last_request_time < time()-$safe_wait){
+      return;
+    }
     $sleeping = ceil(2000/$this->hour_limits[$hour]*1000)*1000;
+    if($this->last_request_time-time() > 0){
+      $sleeping = $sleeping - (($this->last_request_time-time()) * 1000 * 1000); 
+    }
     usleep($sleeping);
     return;
   }
@@ -152,6 +160,7 @@ class Limiter {
     }
     $this->hour_requests[$hour] = $this->hour_requests[$hour] + 1;
     $this->last_hour = $hour;
+    $this->last_request_time = time();
     return $this->hour_requests[$hour];
   }
   public function hourLimitExceeded($time=null) {

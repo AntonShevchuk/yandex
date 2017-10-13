@@ -872,9 +872,10 @@ class Request
         if (!empty($this->proxy['host'])) {
             $this->applyProxy($ch);
         }
-
+        $this->limiter->wait();
+        $this->limiter->waitHour();
         $data = curl_exec($ch);
-
+        $this->limiter->increment();
         $simpleXML = new \SimpleXMLElement($data);
 
         /** @var \SimpleXMLElement $simpleXML */
@@ -887,7 +888,7 @@ class Request
 
             throw new YandexXmlException($message, $code);
         }
-
+        
         $response = new Response();
 
         // results
