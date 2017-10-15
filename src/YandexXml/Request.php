@@ -696,7 +696,7 @@ class Request
         if (is_null($host)) {
             return $this->getProxy();
         } else {
-            $this->limiter->setProxy($host, $port, $user, $pass);
+            $this->limiter->proxy($host, $port, $user, $pass);
             return $this->setProxy($host, $port, $user, $pass);
         }
     }

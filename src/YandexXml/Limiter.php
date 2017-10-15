@@ -16,12 +16,12 @@ class Limiter {
     $this->key = $key;
     if(!is_null($proxy)){
       if(!is_array($proxy)){
-        throw new Exception('Proxy should be array with keys: host,port,user,pass', 1);
+        throw new \Exception('Proxy should be array with keys: host,port,user,pass', 1);
       }else{
         $this->proxy = $proxy;
       }
     }
-    $this->loadLimits();
+    //$this->loadLimits();
   }
   // Функции прокси скопированы из anton-shevchuk/yandex-xml-library
   /**
@@ -101,14 +101,14 @@ class Limiter {
     }else if( ini_get('allow_url_fopen') ) {
       $data = file_get_contents($url);
     }else{
-      throw new Exception("url fopen disabled. Curl not enabled. How do we get data?", 1);
+      throw new \Exception("url fopen disabled. Curl not enabled. How do we get data?", 1);
     }
     $simpleXML = new \SimpleXMLElement($data);
     if(!is_object($simpleXML)){
-      throw new Exception("simpleXML failed to get object", 1);
+      throw new \Exception("simpleXML failed to get object", 1);
     }
     if(isset($simpleXML->response->error)&&!empty($simpleXML->response->error)){
-      throw new Exception("Yandex XML error: ".$simpleXML->response->error, 1);
+      throw new \Exception("Yandex XML error: ".$simpleXML->response->error, 1);
     }
     if(isset($simpleXML->response->limits->{'time-interval'})){
       foreach ($simpleXML->response->limits->{'time-interval'} as $limit) {
@@ -117,7 +117,7 @@ class Limiter {
         $this->hour_limits[gmdate("G",$from_unix)] = (int)$limit;
       }
     }else{
-      throw new Exception("Response limits not set", 1);
+      throw new \Exception("Response limits not set", 1);
     }
   }
   public function getLimit($time=null) {
@@ -175,7 +175,7 @@ class Limiter {
       $this->hour_requests[$hour] = 0;
     }
     if(!isset($this->hour_limits[$hour])){
-      throw new Exception("hourLimitExceeded has no data about requests hour_requests: ".var_export($this->hour_limits,true), 1);
+      throw new \Exception("hourLimitExceeded has no data about requests hour_requests: ".var_export($this->hour_limits,true), 1);
     }
     if($this->hour_requests[$hour] >= $this->hour_limits[$hour]){
       return true;
