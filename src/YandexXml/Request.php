@@ -205,6 +205,15 @@ class Request
         'user' => '',
         'pass' => ''
     );
+    /**
+     * Wait or not. Limit rate or not
+     * @var bool
+     */
+    protected $wait = true;
+    /**
+     * Rate Limiter object
+     * @var Limiter
+     */
     protected $limiter;
     /**
      * __construct
@@ -219,6 +228,17 @@ class Request
         $this->limiter = new Limiter($user, $key);
     }
 
+    public function nowait()
+    {
+      $this->wait = false;
+      return $this;
+    }
+    public function wait()
+    {
+      $this->wait = true;
+      return $this;
+    }
+    
     /**
      * Set Base URL
      * @param string $baseUrl
@@ -872,8 +892,10 @@ class Request
         if (!empty($this->proxy['host'])) {
             $this->applyProxy($ch);
         }
-        $this->limiter->wait();
-        $this->limiter->waitHour();
+        if($this->wait){
+          $this->limiter->wait();
+          $this->limiter->waitHour();
+        }
         $data = curl_exec($ch);
         $this->limiter->increment();
         $simpleXML = new \SimpleXMLElement($data);
