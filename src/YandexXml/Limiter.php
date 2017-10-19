@@ -41,7 +41,27 @@ class Limiter {
           return $this->setProxy($host, $port, $user, $pass);
       }
   }
-
+  /**
+   * get limits data for external storage
+   * @return void
+   */
+  public function getData(){
+    return array($this->hour_limits,$this->hour_requests,$this->last_hour,$this->last_request_time);
+  }
+  /**
+   * set limits data from external storage
+   * @param array $hour_limits       per hour limits
+   * @param array $hour_requests     per hour requests
+   * @param string $last_hour         last operated hour (integer)
+   * @param integer $last_request_time last request time unix
+   */
+  public function setData($hour_limits,$hour_requests,$last_hour,$last_request_time){
+    $this->hour_limits = $hour_limits;
+    $this->hour_requests = $hour_requests;
+    $this->$last_hour = $last_hour;
+    $this->last_request_time = $last_request_time;
+    return;
+  }
   /**
    * Set proxy for request
    *
